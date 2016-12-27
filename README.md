@@ -20,3 +20,12 @@ Create a client:
 ```node
 const client = new Eccentrade.Client({ token: 'my_token' });
 ```
+
+#### Using credentials (deprecated)
+```node
+const client = new Eccentrade.Client({
+  appId: <appId>
+  email: <email>
+  password: <password>
+});
+```
