@@ -12,6 +12,9 @@ export default class Client {
       console.log('Missing Eccentrade API client configuration settings.');
     }
     this.baseUrl = options.url || 'https://api.eccentrade.com';
+    this.token = options.token;
+
+    // Deprecated login
     this.appId = options.appId;
     this.username = options.email;
     this.password = options.password;
