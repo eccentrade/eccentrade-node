@@ -1,7 +1,13 @@
 {
   "name": "eccentrade-client",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "description": "Node.js bindings for the Eccentrade API.",
+  "author": "Sander van den Akker",
+  "license": "MIT",
+  "homepage": "https://github.com/eccentrade/eccentrade-node#readme",
+  "engines": {
+    "node": ">=4"
+  },
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src --out-dir dist",
@@ -13,10 +19,6 @@
     "type": "git",
     "url": "https://github.com/eccentrade/eccentrade-node.git"
   },
-  "private": true,
-  "author": "Sander van den Akker",
-  "license": "UNLICENSED",
-  "homepage": "https://github.com/eccentrade/eccentrade-node#readme",
   "dependencies": {
     "bluebird": "^3.4.7",
     "lodash": "^4.17.3",
@@ -32,8 +34,5 @@
     "eslint-plugin-import": "^2.1.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "nodemon": "^1.11.0"
-  },
-  "engines": {
-    "node": ">=4"
   }
 }
