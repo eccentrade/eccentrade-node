@@ -1,5 +1,5 @@
 # eccentrade-node
-> Official Node bindings for the Eccentrade API https://developer.eccentrade.com
+> Official JavaScript client for the Eccentrade API https://developer.eccentrade.com. Works on both server and client side.
 
 ## Installation
 
