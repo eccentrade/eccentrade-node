@@ -14,7 +14,7 @@ export default class Companies {
    * @memberOf Companies
    */
    get(guid, cb) {
-    return this.client.get(`companies/${guid}`, null, cb);
+     return this.client.get(`companies/${guid}`, {}, cb);
   }
 
   /**

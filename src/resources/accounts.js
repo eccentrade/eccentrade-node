@@ -5,24 +5,6 @@ export default class Accounts {
   }
 
   /**
-   * Sign in.
-   *
-   * @param {string} appId The appId if the requesting app.
-   * @param {object} options
-   * @param {function} cb The callback with two parameters, error and a result object.
-   * @returns
-   * 
-   * @memberOf Accounts
-   */
-  login(email, password, cb) {
-    return this.client.post('auth/login', {
-      appId: this.client.appId,
-      email,
-      password,
-    }, cb);
-  }
-
-  /**
    * Request a password reset link.
    *
    * @param {string} appId The appId if the requesting app.
