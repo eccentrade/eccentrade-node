@@ -20,9 +20,9 @@
     "url": "https://github.com/eccentrade/eccentrade-node.git"
   },
   "dependencies": {
-    "bluebird": "^3.4.7",
-    "lodash": "^4.17.3",
-    "request": "^2.79.0"
+    "es6-promise": "^4.0.5",
+    "isomorphic-fetch": "^2.2.1",
+    "lodash": "^4.17.3"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
@@ -30,9 +30,9 @@
     "babel-preset-es2015": "^6.18.0",
     "eslint": "^3.12.2",
     "eslint-config-airbnb": "^13.0.0",
-    "eslint-plugin-react": "^6.8.0",
     "eslint-plugin-import": "^2.1.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.8.0",
     "nodemon": "^1.11.0"
   }
 }
