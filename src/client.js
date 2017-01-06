@@ -101,31 +101,14 @@ export default class Client {
       cb(new Error(JSON.stringify(error)));
       throw new Error(JSON.stringify(error))
     });
-      // if (response.statusCode === 401) {
-      //   this.authorize(() => {
-      //     fetch(payload).then((response) => {
-      //       if (response.statusCode !== 200) {
-      //         return cb(new Error(JSON.stringify(response.body)));
-      //       } else {
-      //         return cb(null, response.json());
-      //       }
-      //     }).catch((error) => {
-      //       return cb(new Error(JSON.stringify(error)));
-      //     });
-      //   });
-      // } else {
-      //   return cb(null, response.json());
-      // }
   }
 
     /**
    * Shortcut for doing a GET request.
-   * 
+   *
    * @param {string} resource
    * @param {object} params Optional query parameters.
    * @returns
-   * 
-   * @memberOf Client
    */
   get(resource, params, cb) {
     return this.call('GET', resource, {
@@ -135,12 +118,10 @@ export default class Client {
 
   /**
    * Shortcut for doing a POST request.
-   * 
+   *
    * @param {string} resource The resource to request.
    * @param {object} body The data object to form the request body.
    * @returns
-   * 
-   * @memberOf Client
    */
   post(resource, body, cb) {
     return this.call('POST', resource, {
@@ -165,12 +146,10 @@ export default class Client {
 
   /**
    * Shortcut for doing a DELETE request.
-   * 
+   *
    * @param {string} resource The resource to request.
    * @param {object} body The data object to form the request body.
    * @returns
-   * 
-   * @memberOf Client
    */
   delete(resource, body, cb) {
     return this.call('DELETE', resource, {
@@ -178,6 +157,9 @@ export default class Client {
     }, cb);
   }
 
+  /**
+   * Authorizes a client by logging in an storing the token for subsequent calls.
+   */
   authorize(cb = () => {}) {
     return this.auth.login(this.username, this.password, (error, result) => {
       if (error) {
