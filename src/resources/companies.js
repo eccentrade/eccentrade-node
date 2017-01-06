@@ -12,7 +12,7 @@ export default class Companies {
    * @returns
    */
    get(guid, cb) {
-     return this.client.get(`companies/${guid}`, {}, cb);
+     return this.client.get(`companies/${guid}`, null, cb);
   }
 
   /**
