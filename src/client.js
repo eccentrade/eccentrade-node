@@ -44,21 +44,33 @@ export default class Client {
     const self = this;
 
     /**
-     * Transparently authorizes a client.
+     * Transparently checks the response and authorizes a client.
      */
-    function auth(response) {
-      return new Promise((resolve, reject) => {
-        if (response.status === 401) {
-          self.auth.login(this.username, this.password, (error, result) => {
-            if (error) reject(error);
-            self.token = result.token;
-            resolve(response);
-          });
-        } else {
-          resolve(response);
-        }
-      });
+    function check(response) {
+      if (response.status >= 200 && response.status < 300) {
+        return response;
+      } else {
+        const error = new Error(response.statusText);
+        error.response = response;
+        throw error;
+      }
     }
+    // function check(response) {
+    //   return new Promise((resolve, reject) => {
+    //     if (response.statusCode === 200) {
+    //       resolve(response);
+    //     }
+    //     else if (response.status === 401) {
+    //       self.auth.login(this.username, this.password, (error, result) => {
+    //         if (error) reject(error);
+    //         self.token = result.token;
+    //         resolve(response);
+    //       });
+    //     } else {
+    //       resolve(response);
+    //     }
+    //   });
+    // }
 
     let url = `${this.baseUrl}/${resource}`;
     if (options.params) {
@@ -78,16 +90,16 @@ export default class Client {
     if (this.token) {
       payload.headers['Authorization'] = `Bearer ${this.token}`;
     }
-
-    fetch(url, payload)
-    .then(auth)
+    return fetch(url, payload)
+    .then(check)
     .then((response) => {
       return response.json();
     }).then((json) => {
-      console.log(json);
-      return cb(null, json);
+      cb(null, json);
+      return json;
     }).catch((error) => {
-      return cb(new Error(JSON.stringify(error)));
+      cb(new Error(JSON.stringify(error)));
+      throw new Error(JSON.stringify(error))
     });
       // if (response.statusCode === 401) {
       //   this.authorize(() => {
@@ -116,15 +128,9 @@ export default class Client {
    * @memberOf Client
    */
   get(resource, params, cb) {
-    this.call('GET', resource, {
+    return this.call('GET', resource, {
       params,
-    }, (error, result) => {
-      if (error) {
-        cb(error);
-      } else {
-        cb(null, result);
-      }
-    });
+    }, cb);
   }
 
   /**
@@ -137,15 +143,9 @@ export default class Client {
    * @memberOf Client
    */
   post(resource, body, cb) {
-    this.call('POST', resource, {
+    return this.call('POST', resource, {
       body,
-    }, (error, result) => {
-      if (error) {
-        cb(error);
-      } else {
-        cb(null, result);
-      }
-    });
+    }, cb);
   }
 
   /**
@@ -158,15 +158,9 @@ export default class Client {
    * @memberOf Client
    */
   patch(resource, body, cb) {
-    this.call('PATCH', resource, {
+    return this.call('PATCH', resource, {
       body,
-    }, (error, result) => {
-      if (error) {
-        cb(error);
-      } else {
-        cb(null, result);
-      }
-    });
+    }, cb);
   }
 
   /**
@@ -179,21 +173,15 @@ export default class Client {
    * @memberOf Client
    */
   delete(resource, body, cb) {
-    this.call('DELETE', resource, {
+    return this.call('DELETE', resource, {
       body,
-    }, (error, result) => {
-      if (error) {
-        cb(error);
-      } else {
-        cb(null, result);
-      }
-    });
+    }, cb);
   }
 
-  authorize(cb) {
-    this.accounts.login(this.username, this.password, (error, result) => {
+  authorize(cb = () => {}) {
+    return this.auth.login(this.username, this.password, (error, result) => {
       if (error) {
-        return cb(error);
+        cb(error);
       }
       this.token = result.token;
       cb(null, true);
