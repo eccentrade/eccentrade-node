@@ -11,8 +11,8 @@ export default class Companies {
    * @param {function} cb The callback with two parameters, errror and company.
    * @returns
    */
-   get(guid, cb) {
-     return this.client.get(`companies/${guid}`, null, cb);
+  get(guid, params, cb) {
+    return this.client.get(`companies/${guid}`, params, cb);
   }
 
   /**
