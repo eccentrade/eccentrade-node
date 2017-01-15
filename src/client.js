@@ -47,7 +47,7 @@ export default class Client {
      * Transparently checks the response and authorizes a client.
      */
     function check(response) {
-      if (response.status >= 200 && response.status < 300) {
+      if (response.ok) {
         return response;
       } else {
         const error = new Error(response.statusText);
