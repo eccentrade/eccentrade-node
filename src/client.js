@@ -17,12 +17,13 @@ export default class Client {
       console.log('Missing Eccentrade API client configuration settings.');
     }
     this.baseUrl = options.url || 'https://api.eccentrade.com';
-    this.token = options.token;
-
-    // Deprecated login
     this.appId = options.appId;
-    this.username = options.email;
-    this.password = options.password;
+    this.token = options.token;
+    this.refreshToken = options.refreshToken;
+    this.expiresIn = options.expiresIn;
+
+    this.username = options.email; // Deprecated
+    this.password = options.password; // Deprecated
 
     this.accounts = new Accounts(this);
     this.auth = new Auth(this);
@@ -32,45 +33,14 @@ export default class Client {
   }
 
   /**
-   * Execute a raw API request.
+   * Execute a raw API request. Checks for 401 unauthorized and retries automatically.
    * 
    * @param {string} resource The resource to request.
    * @param {object} options The options object to form the request object.
    * @returns
-   * 
-   * @memberOf Client
    */
   call(method = 'GET', resource, options, cb = () => {}) {
     const self = this;
-
-    /**
-     * Transparently checks the response and authorizes a client.
-     */
-    function check(response) {
-      if (response.ok) {
-        return response;
-      } else {
-        const error = new Error(response.statusText);
-        error.response = response;
-        throw error;
-      }
-    }
-    // function check(response) {
-    //   return new Promise((resolve, reject) => {
-    //     if (response.statusCode === 200) {
-    //       resolve(response);
-    //     }
-    //     else if (response.status === 401) {
-    //       self.auth.login(this.username, this.password, (error, result) => {
-    //         if (error) reject(error);
-    //         self.token = result.token;
-    //         resolve(response);
-    //       });
-    //     } else {
-    //       resolve(response);
-    //     }
-    //   });
-    // }
 
     let url = `${this.baseUrl}/${resource}`;
     if (options.params) {
@@ -87,19 +57,38 @@ export default class Client {
       },
     }, options);
     payload.method = method;
-    if (this.token) {
-      payload.headers['Authorization'] = `Bearer ${this.token}`;
-    }
-    return fetch(url, payload)
-    .then(check)
-    .then((response) => {
-      return response.json();
-    }).then((json) => {
-      cb(null, json);
-      return json;
-    }).catch((error) => {
-      cb(new Error(JSON.stringify(error)));
-      throw new Error(JSON.stringify(error))
+
+    return new Promise((resolve, reject) => {
+      const authorizedFetch = (retry = false) => {
+        if (this.token) {
+          payload.headers['Authorization'] = `Bearer ${this.token}`;
+        }
+        fetch(url, payload)
+          .then((response) => {
+            if (response.ok) {
+              return resolve(response.json());
+            } else if (response.status === 401) {
+              return self.auth.refresh(self.refreshToken)
+                .then((response) => {
+                  self.token = response.token;
+                  return authorizedFetch();
+                })
+                .catch((error) => {
+                  return reject(error);
+                });
+            } else {
+              return resolve(response);
+            }
+          })
+          .catch((error) => { // Should only happen on connection problems.
+            if (!retry) {
+              return authorizedFetch(true);
+            } else {
+              return reject(error);
+            }
+          });
+      };
+      authorizedFetch();
     });
   }
 
@@ -110,7 +99,7 @@ export default class Client {
    * @param {object} params Optional query parameters.
    * @returns
    */
-  get(resource, params, cb) {
+  get(resource, params = null, cb) {
     return this.call('GET', resource, {
       params,
     }, cb);
@@ -131,12 +120,10 @@ export default class Client {
 
   /**
    * Shortcut for doing a PATCH request.
-   * 
+   *
    * @param {string} resource The resource to request.
    * @param {object} body The data object to form the request body.
    * @returns
-   * 
-   * @memberOf Client
    */
   patch(resource, body, cb) {
     return this.call('PATCH', resource, {
@@ -158,7 +145,7 @@ export default class Client {
   }
 
   /**
-   * Authorizes a client by logging in an storing the token for subsequent calls.
+   * Authorizes a client by logging in and storing the token for subsequent calls.
    */
   authorize(cb = () => {}) {
     return this.auth.login(this.username, this.password, (error, result) => {
@@ -166,6 +153,8 @@ export default class Client {
         cb(error);
       }
       this.token = result.token;
+      this.refreshToken = result.refreshToken;
+      this.expiresIn = result.expiresIn;
       cb(null, true);
     });
   }
