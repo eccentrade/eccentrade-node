@@ -22,11 +22,15 @@ export default class Users {
 
   /**
    * Refresh the access token.
-   * 
+   *
+   * @param {string} refreshToken The refresh token.
    * @returns
    */
-  refresh(cb) {
-    return this.client.post('auth/refresh', {}, cb);
+  refresh(refreshToken, cb) {
+    return this.client.post('auth/refresh', {
+      appId: this.client.appId,
+      refreshToken,
+    }, cb);
   }
 
 }
