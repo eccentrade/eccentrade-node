@@ -66,24 +66,24 @@ export default class Client {
         fetch(url, payload)
           .then((response) => {
             if (response.ok) {
-              return resolve(response.json());
+              return response.json();
             } else if (response.status === 401) {
               return self.auth.refresh(self.refreshToken)
-                .then((response) => {
-                  self.token = response.token;
+                .then((result) => {
+                  self.token = result.token;
                   return authorizedFetch();
-                })
-                .catch((error) => {
-                  return reject(error);
                 });
-            } else {
-              return resolve(response);
             }
+          })
+          .then((json) => {
+            cb(null, json);
+            return resolve(json);
           })
           .catch((error) => { // Should only happen on connection problems.
             if (!retry) {
               return authorizedFetch(true);
             } else {
+              cb(error);
               return reject(error);
             }
           });
