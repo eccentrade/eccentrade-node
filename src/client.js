@@ -68,10 +68,11 @@ export default class Client {
             if (response.ok) {
               return response.json();
             } else if (response.status === 401) {
+              // Transparently try to authorize and retry the request by throwing an error.
               return self.auth.refresh(self.refreshToken)
                 .then((result) => {
                   self.token = result.token;
-                  return authorizedFetch();
+                  throw response.status;
                 });
             }
           })
@@ -79,7 +80,7 @@ export default class Client {
             cb(null, json);
             return resolve(json);
           })
-          .catch((error) => { // Should only happen on connection problems.
+          .catch((error) => {
             if (!retry) {
               return authorizedFetch(true);
             } else {
