@@ -1,8 +1,8 @@
 {
   "name": "eccentrade-client",
-  "version": "1.0.4",
-  "description": "Node.js bindings for the Eccentrade API.",
-  "author": "Sander van den Akker",
+  "version": "1.0.5",
+  "description": "Universal Javascript bindings for the Eccentrade API.",
+  "author": "Sander van den Akker <sander@eccentrade.com>",
   "license": "MIT",
   "homepage": "https://github.com/eccentrade/eccentrade-node#readme",
   "engines": {
