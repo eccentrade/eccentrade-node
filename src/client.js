@@ -65,20 +65,20 @@ export default class Client {
         }
         fetch(url, payload)
           .then((response) => {
-            if (response.ok) {
-              return response.json();
-            } else if (response.status === 401) {
+            if (response.status === 401) {
               // Transparently try to authorize and retry the request by throwing an error.
               return self.auth.refresh(self.refreshToken)
                 .then((result) => {
                   self.token = result.token;
+                  Hook.call('onTokenRefresh', result.token);
                   throw response.status;
                 });
             }
+            return response.json();
           })
-          .then((json) => {
-            cb(null, json);
-            return resolve(json);
+          .then((result) => {
+            cb(null, result);
+            return resolve(result);
           })
           .catch((error) => {
             if (!retry) {
