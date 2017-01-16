@@ -2,6 +2,8 @@ import { merge } from 'lodash';
 import Promise from 'es6-promise';
 import 'isomorphic-fetch';
 
+import Hook from './hook';
+
 import Accounts from './resources/accounts';
 import Auth from './resources/auth';
 import Companies from './resources/companies';
