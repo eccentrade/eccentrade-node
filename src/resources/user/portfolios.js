@@ -1,0 +1,109 @@
+export default class Portfolios {
+
+  constructor(client) {
+    this.client = client;
+  }
+
+  /**
+   * List all portfolios for the authenticated user.
+   *
+   * @param {object} params
+   * @param {function} cb
+   *
+   * @returns {Promise}
+   */
+  list(params, cb) {
+    return this.client.get('user/portfolios', params, cb);
+  }
+
+  /**
+   * Get a portfolio for the authenticated user.
+   *
+   * @param {string} portfolioId
+   * @param {object} params
+   * @param {function} cb
+   *
+   * @returns {Promise}
+   */
+  get(portfolioId, params, cb) {
+    return this.client.get(`user/portfolios/${portfolioId}`, params, cb);
+  }
+
+  /**
+   * Create a new portfolio for the authenticated user.
+   *
+   * @param {object} body The portfolio to create.
+   * @param {function} cb The callback with two parameters, errror and the newly created portfolio.
+   * 
+   * @returns {Promise}
+   */
+  create(body, cb) {
+    return this.client.post('user/portfolios', body, cb);
+  }
+
+  /**
+   * Update a new portfolio for the authenticated user.
+   *
+   * @param {string} portfolioId The portfolio ID.
+   * @param {object} body The fields to update.
+   * @param {function} cb The callback with two parameters, error and the updated portfolio.
+   * 
+   * @returns {Promise}
+   */
+  update(portfolioId, body, cb) {
+    this.client.patch(`user/portfolios/${portfolioId}`, body, cb);
+  }
+
+  /**
+   * Delete a portfolio for the authenticated user.
+   *
+   * @param {string} portfolioId The portfolio ID.
+   * @param {function} cb A callback with one error parameter.
+   * 
+   * @returns {Promise}
+   */
+  delete(portfolioId, cb) {
+    return this.client.delete(`user/portfolios/${portfolioId}`, cb);
+  }
+
+  /**
+   * Get companies info for a portfolio for the authenticated user.
+   * TODO Merge with get above.
+   *
+   * @param {string} portfolioId
+   * @param {object} params
+   * @param {function} cb
+   *
+   * @returns {Promise}
+   */
+  getCompanies(portfolioId, params, cb) {
+    return this.client.get(`user/portfolios/${portfolioId}/companies`, params, cb);
+  }
+
+  /**
+   * Add a company to a portfolio for the authenticated user.
+   *
+   * @param {string} portfolioId The portfolio ID to add the company to.
+   * @param {object} body Details of the company to add.
+   * @param {function} cb The callback with one error parameter.
+   * 
+   * @returns {Promise}
+   */
+  addCompany(portfolioId, body, cb) {
+    return this.client.post(`user/portfolios/${portfolioId}/companies`, body, cb);
+  }
+
+  /**
+   * Delete a company from a portfolio for the authenticated user.
+   *
+   * @param {string} portfolioId The portfolio ID.
+   * @param {string} guid The guid of the company to delete from the portfolio.
+   * @param {function} cb A callback with one error parameter.
+   * 
+   * @returns {Promise}
+   */
+  deleteCompany(portfolioId, guid, cb) {
+    return this.client.delete(`user/portfolios/${portfolioId}/companies/${guid}`, cb);
+  }
+
+}

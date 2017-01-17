@@ -24,7 +24,7 @@ export default class Users {
    * @returns
    */
   get(userId, params, cb) {
-    return this.client.get(`users/${guid}`, params, cb);
+    return this.client.get(`users/${userId}`, params, cb);
   }
 
   /**
@@ -57,8 +57,8 @@ export default class Users {
    * @param {function} cb The callback with two parameters, error and a result object with the deleted resource count.
    * @returns
    */
-  delete(guid, cb) {
-    return this.client.delete(`companies/${guid}`, cb);
+  delete(userId, cb) {
+    return this.client.delete(`companies/${userId}`, cb);
   }
 
 }

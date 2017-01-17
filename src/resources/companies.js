@@ -42,7 +42,7 @@ export default class Companies {
    * Delete a single company resource.
    *
    * @param {string} guid The Global Unique ID of the company.
-   * @param {function} cb The callback with two parameters, error and a result object with the deleted resource count.
+   * @param {function} cb A callback with one error parameter.
    * @returns
    */
   delete(guid, cb) {

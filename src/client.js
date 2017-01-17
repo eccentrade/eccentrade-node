@@ -7,7 +7,9 @@ import Hook from './hook';
 import Accounts from './resources/accounts';
 import Auth from './resources/auth';
 import Companies from './resources/companies';
+import Portfolios from './resources/portfolios';
 import Search from './resources/search';
+import User from './resources/user';
 import Users from './resources/users';
 
 // Polyfill for older browsers.
@@ -30,7 +32,9 @@ export default class Client {
     this.accounts = new Accounts(this);
     this.auth = new Auth(this);
     this.companies = new Companies(this);
+    this.portfolios = new Portfolios(this);
     this.search = new Search(this);
+    this.user = new User(this);
     this.users = new Users(this);
   }
 
