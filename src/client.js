@@ -64,11 +64,19 @@ export default class Client {
     }, options);
     payload.method = method;
 
-    function handleErrors(response) {
-      if (!response.ok && response.status !== 401) {
-        throw Error(response.statusText);
+    function handle(response) {
+      if (response.status === 401) {
+        // Transparently try to authorize and retry the request by throwing an error.
+        return self.auth.refresh(self.refreshToken)
+          .then((result) => {
+            self.token = result.token;
+            //Hook.call('onTokenRefresh', result.token);
+            throw response.status;
+          });
+      } else if (!response.ok) {
+        throw response.json();
       }
-      return response;
+      return response.json();
     }
 
     return new Promise((resolve, reject) => {
@@ -77,29 +85,19 @@ export default class Client {
           payload.headers['Authorization'] = `Bearer ${this.token}`;
         }
         fetch(url, payload)
-          .then(handleErrors)
-          .then((response) => {
-            if (response.status === 401) {
-              // Transparently try to authorize and retry the request by throwing an error.
-              return self.auth.refresh(self.refreshToken)
-                .then((result) => {
-                  self.token = result.token;
-                  Hook.call('onTokenRefresh', result.token);
-                  throw response.status;
-                });
-            }
-            return response.json();
-          })
+          .then(handle)
           .then((result) => {
             cb(null, result);
             return resolve(result);
           })
-          .catch((error) => {
+          .catch((response) => {
             if (!retry) {
               return authorizedFetch(true);
             } else {
-              cb(error);
-              return reject(error);
+              response.then((error) => {
+                cb(error);
+                return reject(error);
+              });
             }
           });
       };
