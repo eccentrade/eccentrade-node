@@ -64,12 +64,20 @@ export default class Client {
     }, options);
     payload.method = method;
 
+    function handleErrors(response) {
+      if (!response.ok && response.status !== 401) {
+        throw Error(response.statusText);
+      }
+      return response;
+    }
+
     return new Promise((resolve, reject) => {
       const authorizedFetch = (retry = false) => {
         if (this.token) {
           payload.headers['Authorization'] = `Bearer ${this.token}`;
         }
         fetch(url, payload)
+          .then(handleErrors)
           .then((response) => {
             if (response.status === 401) {
               // Transparently try to authorize and retry the request by throwing an error.
