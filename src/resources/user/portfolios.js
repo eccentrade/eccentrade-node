@@ -34,7 +34,7 @@ export default class Portfolios {
    *
    * @param {object} body The portfolio to create.
    * @param {function} cb The callback with two parameters, errror and the newly created portfolio.
-   * 
+   *
    * @returns {Promise}
    */
   create(body, cb) {
@@ -47,7 +47,7 @@ export default class Portfolios {
    * @param {string} portfolioId The portfolio ID.
    * @param {object} body The fields to update.
    * @param {function} cb The callback with two parameters, error and the updated portfolio.
-   * 
+   *
    * @returns {Promise}
    */
   update(portfolioId, body, cb) {
@@ -59,7 +59,7 @@ export default class Portfolios {
    *
    * @param {string} portfolioId The portfolio ID.
    * @param {function} cb A callback with one error parameter.
-   * 
+   *
    * @returns {Promise}
    */
   delete(portfolioId, cb) {
@@ -81,29 +81,55 @@ export default class Portfolios {
   }
 
   /**
-   * Add a company to a portfolio for the authenticated user.
+   * Add companies to a portfolio for the authenticated user.
    *
    * @param {string} portfolioId The portfolio ID to add the company to.
-   * @param {object} body Details of the company to add.
+   * @param {array} guids The GUIDs of the companies to add.
    * @param {function} cb The callback with one error parameter.
    * 
    * @returns {Promise}
    */
-  addCompany(portfolioId, body, cb) {
-    return this.client.post(`user/portfolios/${portfolioId}/companies`, body, cb);
+  addCompanies(portfolioId, guids, cb) {
+    return this.client.post(`user/portfolios/${portfolioId}/companies`, { guids }, cb);
   }
 
   /**
-   * Delete a company from a portfolio for the authenticated user.
+   * Remove companies from a portfolio for the authenticated user.
    *
    * @param {string} portfolioId The portfolio ID.
-   * @param {string} guid The guid of the company to delete from the portfolio.
+   * @param {array} guids The GUIDs of the companies to remove.
    * @param {function} cb A callback with one error parameter.
    * 
    * @returns {Promise}
    */
-  deleteCompany(portfolioId, guid, cb) {
-    return this.client.delete(`user/portfolios/${portfolioId}/companies/${guid}`, cb);
+  removeCompanies(portfolioId, guids, cb) {
+    return this.client.delete(`user/portfolios/${portfolioId}/companies`, { guids }, cb);
+  }
+
+  /**
+   * Update the rules that apply to a portfolio for the authenticated user.
+   *
+   * @param {string} portfolioId The portfolio ID.
+   * @param {object} rules The new rules.
+   * @param {function} cb An optional callback with two parameters, error and the result.
+   *
+   * @returns {Promise}
+   */
+  updateRules(portfolioId, rules, cb) {
+    return this.client.post(`user/portfolios/${portfolioId}/rules`, rules, cb);
+  }
+
+  /**
+   * Update the notification settings for a portfolio for the authenticated user.
+   *
+   * @param {string} portfolioId The portfolio ID.
+   * @param {object} notification The new notification details.
+   * @param {function} cb An optional callback with two parameters, error and the result.
+   *
+   * @returns {Promise}
+   */
+  updateNotification(portfolioId, notification, cb) {
+    return this.client.post(`user/portfolios/${portfolioId}/notification`, notification, cb);
   }
 
 }
