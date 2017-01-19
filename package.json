@@ -1,6 +1,6 @@
 {
   "name": "eccentrade-client",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Universal Javascript bindings for the Eccentrade API.",
   "author": "Sander van den Akker <sander@eccentrade.com>",
   "license": "MIT",
