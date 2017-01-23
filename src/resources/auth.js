@@ -5,26 +5,34 @@ export default class Users {
   }
 
   /**
-   * Sign in.
+   * Sign in using either username or email, and a password.
    *
-   * @param {string} email The email address of the user.
-   * @param {object} password The password of the user.
+   * @param {string} user The username or email address.
+   * @param {object} password Password.
    * @param {function} cb The callback with two parameters, error and a result object.
-   * @returns
+   * 
+   * @returns {Promise}
    */
-  login(email, password, cb) {
-    return this.client.post('auth/login', {
+  login(user, password, cb) {
+    const body = {
       appId: this.client.appId,
-      email,
       password,
-    }, cb);
+    };
+    if (user.indexOf('@') === -1) {
+      body.username = user;
+    } else {
+      body.email = user;
+    }
+    return this.client.post('auth/login', body, cb);
   }
 
   /**
    * Refresh the access token.
    *
    * @param {string} refreshToken The refresh token.
-   * @returns
+   * @param {function} cb The callback with two parameters, error and a result object.
+   * 
+   * @returns {Promise}
    */
   refresh(refreshToken, cb) {
     return this.client.post('auth/refresh', {
