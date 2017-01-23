@@ -65,13 +65,15 @@ export default class Client {
     payload.method = method;
 
     function handle(response) {
-      if (response.status === 401) {
-        // Transparently try to authorize and retry the request by throwing an error.
+      // If the current call returned 401 Unauthorized, and it is not a failed login call,
+      if (response.status === 401 && resource !== 'auth/login') {
+        // Transparently retry the request by refreshing the access token.
         return self.auth.refresh(self.refreshToken)
           .then((result) => {
             self.token = result.token;
             //Hook.call('onTokenRefresh', result.token);
-            throw response.status;
+            retry = true;
+            throw response.json();
           });
       } else if (!response.ok) {
         throw response.json();
@@ -80,7 +82,7 @@ export default class Client {
     }
 
     return new Promise((resolve, reject) => {
-      const authorizedFetch = (retry = false) => {
+      const authorizedFetch = (n) => {
         if (this.token) {
           payload.headers['Authorization'] = `Bearer ${this.token}`;
         }
@@ -91,8 +93,8 @@ export default class Client {
             return resolve(result);
           })
           .catch((response) => {
-            if (!retry) {
-              return authorizedFetch(true);
+            if (n > 0) {
+              return authorizedFetch(n - 1);
             } else {
               response.then((error) => {
                 cb(error);
@@ -101,7 +103,7 @@ export default class Client {
             }
           });
       };
-      authorizedFetch();
+      authorizedFetch(1); // Number of tries
     });
   }
 
