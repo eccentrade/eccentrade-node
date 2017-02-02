@@ -2,8 +2,6 @@ import { merge } from 'lodash';
 import Promise from 'es6-promise';
 import 'isomorphic-fetch';
 
-import Hook from './hook';
-
 import Accounts from './resources/accounts';
 import Auth from './resources/auth';
 import Companies from './resources/companies';
@@ -66,13 +64,11 @@ export default class Client {
 
     function handle(response) {
       // If the current call returned 401 Unauthorized, and it is not a failed login call,
-      if (response.status === 401 && resource !== 'auth/login') {
+      if (response.status === 401 && resource !== 'auth/login' && this.refreshToken) {
         // Transparently retry the request by refreshing the access token.
         return self.auth.refresh(self.refreshToken)
           .then((result) => {
             self.token = result.token;
-            //Hook.call('onTokenRefresh', result.token);
-            retry = true;
             throw response.json();
           });
       } else if (!response.ok) {
