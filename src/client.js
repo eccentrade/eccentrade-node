@@ -38,7 +38,8 @@ export default class Client {
 
   /**
    * Execute a raw API request. Checks for 401 unauthorized and retries automatically.
-   * 
+   * Supports both promise and traditional callbacks.
+   *
    * @param {string} resource The resource to request.
    * @param {object} options The options object to form the request object.
    * @returns
@@ -63,18 +64,20 @@ export default class Client {
     payload.method = method;
 
     function handle(response) {
+      if (response.ok) {
+        return response.json();
+      }
       // If the current call returned 401 Unauthorized, and it is not a failed login call,
-      if (response.status === 401 && resource !== 'auth/login' && this.refreshToken) {
+      if (response.status === 401 && resource !== 'auth/login' && self.refreshToken) {
         // Transparently retry the request by refreshing the access token.
         return self.auth.refresh(self.refreshToken)
           .then((result) => {
             self.token = result.token;
             throw response.json();
           });
-      } else if (!response.ok) {
-        throw response.json();
       }
-      return response.json();
+      // Throw the response body as an error.
+      throw response.json();
     }
 
     return new Promise((resolve, reject) => {
