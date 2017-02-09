@@ -13,7 +13,7 @@ export default class Rules {
    * @returns {array}
    */
   list(params, cb) {
-    return this.client.get('portfolios/rules', params, cb);
+    return this.client.get('portfolios/triggers', params, cb);
   }
 
 }
