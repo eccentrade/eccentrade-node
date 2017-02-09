@@ -107,29 +107,29 @@ export default class Portfolios {
   }
 
   /**
-   * Update the rules that apply to a portfolio for the authenticated user.
+   * Update the triggers that apply to a portfolio for the authenticated user.
    *
    * @param {string} portfolioId The portfolio ID.
-   * @param {object} rules The new rules.
+   * @param {object} triggers The new triggers.
    * @param {function} cb An optional callback with two parameters, error and the result.
    *
    * @returns {Promise}
    */
-  updateRules(portfolioId, rules, cb) {
-    return this.client.post(`user/portfolios/${portfolioId}/rules`, rules, cb);
+  updateTriggers(portfolioId, triggers, cb) {
+    return this.client.post(`user/portfolios/${portfolioId}/triggers`, triggers, cb);
   }
 
   /**
-   * Update the notification settings for a portfolio for the authenticated user.
+   * Update the alert settings for a portfolio for the authenticated user.
    *
    * @param {string} portfolioId The portfolio ID.
-   * @param {object} notification The new notification details.
+   * @param {object} alert The new alert details.
    * @param {function} cb An optional callback with two parameters, error and the result.
    *
    * @returns {Promise}
    */
-  updateNotification(portfolioId, notification, cb) {
-    return this.client.post(`user/portfolios/${portfolioId}/notification`, notification, cb);
+  updateAlert(portfolioId, alert, cb) {
+    return this.client.post(`user/portfolios/${portfolioId}/alert`, alert, cb);
   }
 
 }

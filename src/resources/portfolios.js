@@ -1,10 +1,10 @@
-import Rules from './portfolios/rules';
+import Triggers from './portfolios/triggers';
 
 export default class Portfolios {
 
   constructor(client) {
     this.client = client;
-    this.rules = new Rules(this.client);
+    this.triggers = new Triggers(this.client);
   }
 
 }
