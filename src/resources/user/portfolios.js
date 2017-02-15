@@ -51,7 +51,7 @@ export default class Portfolios {
    * @returns {Promise}
    */
   update(portfolioId, body, cb) {
-    this.client.patch(`user/portfolios/${portfolioId}`, body, cb);
+    return this.client.patch(`user/portfolios/${portfolioId}`, body, cb);
   }
 
   /**
