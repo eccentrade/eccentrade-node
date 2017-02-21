@@ -63,7 +63,7 @@ export default class Portfolios {
    * @returns {Promise}
    */
   delete(portfolioId, cb) {
-    return this.client.delete(`user/portfolios/${portfolioId}`, cb);
+    return this.client.delete(`user/portfolios/${portfolioId}`, null, cb);
   }
 
   /**

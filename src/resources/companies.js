@@ -46,7 +46,7 @@ export default class Companies {
    * @returns
    */
   delete(guid, cb) {
-    return this.client.delete(`companies/${guid}`, cb);
+    return this.client.delete(`companies/${guid}`, null, cb);
   }
 
 }
