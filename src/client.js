@@ -105,12 +105,10 @@ export default class Client {
         fetch(url, payload)
           .then(handle)
           .then((result) => {
-            console.log('result', result);
             cb(null, result);
             return resolve(result);
           })
           .catch((response) => {
-            console.log('catch', response);
             if (n > 0) {
               return authorizedFetch(n - 1);
             } else {
