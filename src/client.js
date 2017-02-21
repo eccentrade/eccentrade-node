@@ -1,4 +1,5 @@
 import { merge } from 'lodash';
+import EventEmitter from 'events';
 import Promise from 'es6-promise';
 import 'isomorphic-fetch';
 
@@ -18,6 +19,7 @@ export default class Client {
     if (!options) {
       console.log('Missing Eccentrade API client configuration settings.');
     }
+
     this.baseUrl = options.url || 'https://api.eccentrade.com';
     this.appId = options.appId;
     this.token = options.token;
@@ -34,6 +36,8 @@ export default class Client {
     this.search = new Search(this);
     this.user = new User(this);
     this.users = new Users(this);
+
+    this.events = new EventEmitter();
   }
 
   /**
@@ -46,6 +50,7 @@ export default class Client {
    */
   call(method = 'GET', resource, options, cb = () => {}) {
     const self = this;
+    let rs, rj;
 
     let url = `${this.baseUrl}/${resource}`;
     if (options.params) {
@@ -73,7 +78,12 @@ export default class Client {
         return self.auth.refresh(self.refreshToken)
           .then((result) => {
             self.token = result.token;
+            self.events.emit('authorized', result);
             throw response.json();
+          })
+          .catch((error) => { // By here the refresh failed. Reject.
+            cb(error);
+            return rj(error);
           });
       }
       // Throw the response body as an error.
@@ -81,6 +91,9 @@ export default class Client {
     }
 
     return new Promise((resolve, reject) => {
+      rs = resolve;
+      rj = reject;
+
       const authorizedFetch = (n) => {
         if (this.token) {
           payload.headers['Authorization'] = `Bearer ${this.token}`;
@@ -170,6 +183,7 @@ export default class Client {
       this.refreshToken = result.refreshToken;
       this.expiresIn = result.expiresIn;
       cb(null, true);
+      events.emit('authorized', result);
     });
   }
 
