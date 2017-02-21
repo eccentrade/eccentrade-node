@@ -46,6 +46,7 @@ export default class Client {
    *
    * @param {string} resource The resource to request.
    * @param {object} options The options object to form the request object.
+   * @param {object} options.params Query parameters 
    * @returns
    */
   call(method = 'GET', resource, options, cb = () => {}) {
@@ -53,7 +54,7 @@ export default class Client {
     let rs, rj;
 
     let url = `${this.baseUrl}/${resource}`;
-    if (options.params) {
+    if (options.params && method === 'GET') {
       const urlParameters = Object.keys(options.params).map(i => `${i}=${options.params[i]}`).join('&');
       url += `?${urlParameters}`;
     }
@@ -65,11 +66,15 @@ export default class Client {
         'Content-Type': 'application/json',
         'User-Agent': 'eccentrade-client/1.0.0',
       },
+      //mode: 'cors',
     }, options);
     payload.method = method;
 
     function handle(response) {
       if (response.ok) {
+        if (response.status === 204) { // Empty body
+          return null;
+        }
         return response.json();
       }
       // If the current call returned 401 Unauthorized, and it is not a failed login call,
@@ -86,7 +91,6 @@ export default class Client {
             return rj(error);
           });
       }
-      // Throw the response body as an error.
       throw response.json();
     }
 
@@ -101,21 +105,23 @@ export default class Client {
         fetch(url, payload)
           .then(handle)
           .then((result) => {
+            console.log('result', result);
             cb(null, result);
             return resolve(result);
           })
           .catch((response) => {
+            console.log('catch', response);
             if (n > 0) {
               return authorizedFetch(n - 1);
             } else {
-              response.then((error) => {
+              return Promise.resolve(response).then((error) => {
                 cb(error);
                 return reject(error);
               });
             }
           });
       };
-      authorizedFetch(1); // Number of tries
+      authorizedFetch(0); // Number of retries
     });
   }
 
