@@ -78,7 +78,7 @@ export default class Client {
         return response.json();
       }
       // If the current call returned 401 Unauthorized, and it is not a failed login call,
-      if (response.status === 401 && resource !== 'auth/login' && self.refreshToken) {
+      if (response.status === 401 && resource !== 'auth/login' && resource !== 'auth/refresh' && self.refreshToken) {
         // Transparently retry the request by refreshing the access token.
         return self.auth.refresh(self.refreshToken)
           .then((result) => {
