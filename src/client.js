@@ -181,13 +181,13 @@ export default class Client {
   authorize(cb = () => {}) {
     return this.auth.login(this.username, this.password, (error, result) => {
       if (error) {
-        cb(error);
+        return cb(error);
       }
       this.token = result.token;
       this.refreshToken = result.refreshToken;
       this.expiresIn = result.expiresIn;
-      cb(null, true);
-      events.emit('authorized', result);
+      this.events.emit('authorized', result);
+      return cb(null, true);
     });
   }
 
