@@ -119,7 +119,8 @@ export default class Client {
             }
           });
       };
-      authorizedFetch(0); // Number of retries
+      // Number of retries, we need at least one for transparent authorization.
+      authorizedFetch(1);
     });
   }
 
