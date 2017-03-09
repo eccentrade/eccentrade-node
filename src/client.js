@@ -22,12 +22,12 @@ export default class Client {
 
     this.baseUrl = options.url || 'https://api.eccentrade.com';
     this.appId = options.appId;
-    this.token = options.token;
-    this.refreshToken = options.refreshToken;
-    this.expiresIn = options.expiresIn;
 
-    this.username = options.email; // Deprecated
+    this.refreshToken = options.token; // New token init.
+    this.username = options.email; // Deprecated init.
     this.password = options.password; // Deprecated
+
+    this.expiresIn = options.expiresIn;
 
     this.accounts = new Accounts(this);
     this.auth = new Auth(this);
@@ -180,16 +180,25 @@ export default class Client {
    * Authorizes a client by logging in and storing the token for subsequent calls.
    */
   authorize(cb = () => {}) {
+    console.log('Authorize method');
     return this.auth.login(this.username, this.password, (error, result) => {
       if (error) {
         return cb(error);
       }
-      this.token = result.token;
-      this.refreshToken = result.refreshToken;
-      this.expiresIn = result.expiresIn;
+      this.updateAuthorization(result);
       this.events.emit('authorized', result);
       return cb(null, true);
     });
+  }
+
+  /**
+   * Updates the tokens that are used to authorize requests.
+   *
+   * @param {object} values
+   */
+  setTokens(values) {
+    this.token = values.token;
+    this.refreshToken = values.refreshToken;
   }
 
 }
