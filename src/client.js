@@ -185,7 +185,7 @@ export default class Client {
       if (error) {
         return cb(error);
       }
-      this.updateAuthorization(result);
+      this.setTokens(result);
       this.events.emit('authorized', result);
       return cb(null, true);
     });
