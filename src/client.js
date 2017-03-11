@@ -14,6 +14,21 @@ import Users from './resources/users';
 // Polyfill for older browsers.
 Promise.polyfill();
 
+/**
+ * Converts an object with strings and arrays to a query parameter string.
+ * @param {object} obj The query parameter object.
+ */
+function convertObjectToUrlParameterString(obj) {
+  const str = Object.keys(obj).map((i) => {
+    if (Array.isArray(obj[i])) {
+      return obj[i].map(j => `${i}=${j}`).join('&');
+    } else {
+      return `${i}=${obj[i]}`;
+    }
+  }).join('&');
+  return `?${str}`;
+}
+
 export default class Client {
   constructor(options) {
     if (!options) {
@@ -46,7 +61,7 @@ export default class Client {
    *
    * @param {string} resource The resource to request.
    * @param {object} options The options object to form the request object.
-   * @param {object} options.params Query parameters 
+   * @param {object} options.params Query parameters.
    * @returns
    */
   call(method = 'GET', resource, options, cb = () => {}) {
@@ -55,8 +70,8 @@ export default class Client {
 
     let url = `${this.baseUrl}/${resource}`;
     if (options.params && method === 'GET') {
-      const urlParameters = Object.keys(options.params).map(i => `${i}=${options.params[i]}`).join('&');
-      url += `?${urlParameters}`;
+      const urlParameters = convertObjectToUrlParameterString(options.params);
+      url += urlParameters;
     }
     if (options.body) {
       options.body = JSON.stringify(options.body);
@@ -180,7 +195,6 @@ export default class Client {
    * Authorizes a client by logging in and storing the token for subsequent calls.
    */
   authorize(cb = () => {}) {
-    console.log('Authorize method');
     return this.auth.login(this.username, this.password, (error, result) => {
       if (error) {
         return cb(error);
