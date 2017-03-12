@@ -56,6 +56,58 @@ export default class Client {
   }
 
   /**
+   * Wraps the original fetch with transparent auth and retry.
+   * 
+   * @param {number} n The number of retries for the call in case of network issues.
+   * @param {string} url The request URL.
+   * @param {object} payload The fetch payload.
+   * @param {function} cb Optional callback.
+   *
+   * @returns Promise
+   */
+  fetch(n, url, payload, cb) {
+    // In case the token got refreshed.
+    if (this.token) {
+      payload.headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    return new Promise((resolve, reject) => {
+      fetch(url, payload)
+        .then((response) => {
+          // If the current call returned 401 Unauthorized, and it is not a failed authorization call.
+          if (response.status === 401 && response.url.indexOf('auth') === -1 && this.refreshToken) {
+            // Transparently retry the request by refreshing the access token.
+            return this.auth.refresh(this.refreshToken)
+              .then((result) => {
+                this.token = result.token;
+                this.events.emit('authorized', result);
+                // Retry the original fetch.
+                return this.fetch(n, url, payload, cb);
+              })
+              .catch((error) => { // By here the refresh failed. Reject.
+                cb(error);
+                return reject(error);
+              });
+          }
+          return response;
+        })
+        .then((response) => {
+          return response.constructor.name === 'Response' ? response.json() : response;
+        })
+        .then((result) => {
+          cb(null, result);
+          return resolve(result);
+        })
+        .catch((error) => {
+          if (n > 0) {
+            return this.fetch(n - 1, url, payload, cb);
+          }
+          cb(error);
+          return reject(error);
+        });
+    });
+  };
+
+  /**
    * Execute a raw API request. Checks for 401 unauthorized and retries automatically.
    * Supports both promise and traditional callbacks.
    *
@@ -65,9 +117,6 @@ export default class Client {
    * @returns
    */
   call(method = 'GET', resource, options, cb = () => {}) {
-    const self = this;
-    let rs, rj;
-
     let url = `${this.baseUrl}/${resource}`;
     if (options.params && method === 'GET') {
       const urlParameters = convertObjectToUrlParameterString(options.params);
@@ -79,64 +128,13 @@ export default class Client {
     const payload = merge({
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'eccentrade-client/1.0.0',
+        // 'User-Agent': 'eccentrade-client/1.0.0', // throws an error in Safari
       },
-      //mode: 'cors',
     }, options);
     payload.method = method;
-
-    function handle(response) {
-      if (response.ok) {
-        if (response.status === 204) { // Empty body
-          return null;
-        }
-        return response.json();
-      }
-      // If the current call returned 401 Unauthorized, and it is not a failed login call,
-      if (response.status === 401 && resource !== 'auth/login' && resource !== 'auth/refresh' && self.refreshToken) {
-        // Transparently retry the request by refreshing the access token.
-        return self.auth.refresh(self.refreshToken)
-          .then((result) => {
-            self.token = result.token;
-            self.events.emit('authorized', result);
-            throw response.json();
-          })
-          .catch((error) => { // By here the refresh failed. Reject.
-            cb(error);
-            return rj(error);
-          });
-      }
-      throw response.json();
-    }
-
-    return new Promise((resolve, reject) => {
-      rs = resolve;
-      rj = reject;
-
-      const authorizedFetch = (n) => {
-        if (this.token) {
-          payload.headers['Authorization'] = `Bearer ${this.token}`;
-        }
-        fetch(url, payload)
-          .then(handle)
-          .then((result) => {
-            cb(null, result);
-            return resolve(result);
-          })
-          .catch((response) => {
-            if (n > 0) {
-              return authorizedFetch(n - 1);
-            } else {
-              return Promise.resolve(response).then((error) => {
-                cb(error);
-                return reject(error);
-              });
-            }
-          });
-      };
-      // Number of retries, we need at least one for transparent authorization.
-      authorizedFetch(1);
-    });
+    
+    // Number of retries, we need at least one for transparent authorization.
+    return this.fetch(1, url, payload, cb);
   }
 
     /**
