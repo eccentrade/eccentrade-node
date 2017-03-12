@@ -106,30 +106,4 @@ export default class Portfolios {
     return this.client.delete(`user/portfolios/${portfolioId}/companies`, { guids }, cb);
   }
 
-  /**
-   * Update the triggers that apply to a portfolio for the authenticated user.
-   *
-   * @param {string} portfolioId The portfolio ID.
-   * @param {object} triggers The new triggers.
-   * @param {function} cb An optional callback with two parameters, error and the result.
-   *
-   * @returns {Promise}
-   */
-  updateTriggers(portfolioId, triggers, cb) {
-    return this.client.post(`user/portfolios/${portfolioId}/triggers`, triggers, cb);
-  }
-
-  /**
-   * Update the alert settings for a portfolio for the authenticated user.
-   *
-   * @param {string} portfolioId The portfolio ID.
-   * @param {object} alert The new alert details.
-   * @param {function} cb An optional callback with two parameters, error and the result.
-   *
-   * @returns {Promise}
-   */
-  updateAlert(portfolioId, alert, cb) {
-    return this.client.post(`user/portfolios/${portfolioId}/alert`, alert, cb);
-  }
-
 }
