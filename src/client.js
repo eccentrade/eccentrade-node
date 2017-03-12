@@ -91,7 +91,7 @@ export default class Client {
           return response;
         })
         .then((response) => {
-          return response.constructor.name === 'Response' ? response.json() : response;
+          return response.constructor.name === 'Response' || response.constructor.name === 'Body' ? response.json() : response;
         })
         .then((result) => {
           cb(null, result);
