@@ -16,6 +16,7 @@ Promise.polyfill();
 
 /**
  * Converts an object with strings and arrays to a query parameter string.
+ * 
  * @param {object} obj The query parameter object.
  */
 function convertObjectToUrlParameterString(obj) {
@@ -29,9 +30,24 @@ function convertObjectToUrlParameterString(obj) {
   return `?${str}`;
 }
 
+/**
+ * Adds timeout functionality the whatwg-fetch polyfill is missing.
+ *
+ * @param {number} ms Milliseconds until the timeout.
+ * @param {Promise} promise The Promise object to chain.
+ */
+function timeout(ms, promise) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error('ECONNTIMEOUT'));
+    }, ms);
+    promise.then(resolve, reject);
+  });
+}
+
 export default class Client {
   constructor(options) {
-    if (!options) {
+    if (!options || !options.url || !options.appId) {
       console.log('Missing Eccentrade API client configuration settings.');
     }
 
@@ -42,7 +58,7 @@ export default class Client {
     this.username = options.email; // Deprecated init.
     this.password = options.password; // Deprecated
 
-    this.expiresIn = options.expiresIn;
+    this.timeout = options.timeout || 30000; // Optional request timeout (ms).
 
     this.accounts = new Accounts(this);
     this.auth = new Auth(this);
@@ -101,6 +117,7 @@ export default class Client {
           if (n > 0) {
             return this.fetch(n - 1, url, payload, cb);
           }
+          console.log(error);
           cb(error);
           return reject(error);
         });
@@ -117,6 +134,13 @@ export default class Client {
    * @returns
    */
   call(method = 'GET', resource, options, cb = () => {}) {
+    const defaults = {
+      headers: {
+        'Content-Type': 'application/json',
+        // 'User-Agent': '', // throws an error in Safari
+      },
+      timeout: this.timeout,
+    };
     let url = `${this.baseUrl}/${resource}`;
     if (options.params && method === 'GET') {
       const urlParameters = convertObjectToUrlParameterString(options.params);
@@ -125,16 +149,10 @@ export default class Client {
     if (options.body) {
       options.body = JSON.stringify(options.body);
     }
-    const payload = merge({
-      headers: {
-        'Content-Type': 'application/json',
-        // 'User-Agent': 'eccentrade-client/1.0.0', // throws an error in Safari
-      },
-    }, options);
+    const payload = merge(defaults, options);
     payload.method = method;
-    
-    // Number of retries, we need at least one for transparent authorization.
-    return this.fetch(1, url, payload, cb);
+
+    return timeout(this.timeout, this.fetch(1, url, payload, cb));
   }
 
     /**
