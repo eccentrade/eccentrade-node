@@ -89,6 +89,10 @@ export default class Client {
     return new Promise((resolve, reject) => {
       fetch(url, payload)
         .then((response) => {
+          const body = response.json();
+          if (response.ok) {
+            return body.then((result) => { return result; });
+          }
           // If the current call returned 401 Unauthorized, and it is not a failed authorization call.
           if (response.status === 401 && response.url.indexOf('auth') === -1 && this.refreshToken) {
             // Transparently retry the request by refreshing the access token.
@@ -103,21 +107,18 @@ export default class Client {
                 cb(error);
                 return reject(error);
               });
+          } else {
+            if (n > 0) {
+              return this.fetch(n - 1, url, payload, cb);
+            }
           }
-          return response;
-        })
-        .then((response) => {
-          return response.constructor.name === 'Response' || response.constructor.name === 'Body' ? response.json() : response;
+          return body.then((error) => { throw error; });
         })
         .then((result) => {
           cb(null, result);
           return resolve(result);
         })
         .catch((error) => {
-          if (n > 0) {
-            return this.fetch(n - 1, url, payload, cb);
-          }
-          console.log(error);
           cb(error);
           return reject(error);
         });
