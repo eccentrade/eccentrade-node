@@ -58,7 +58,7 @@ export default class Users {
    * @returns
    */
   delete(userId, cb) {
-    return this.client.delete(`companies/${userId}`, cb);
+    return this.client.delete(`users/${userId}`, cb);
   }
 
 }

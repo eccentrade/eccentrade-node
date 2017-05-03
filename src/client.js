@@ -4,6 +4,7 @@ import Promise from 'es6-promise';
 import 'isomorphic-fetch';
 
 import Accounts from './resources/accounts';
+import Applications from './resources/applications';
 import Auth from './resources/auth';
 import Companies from './resources/companies';
 import Portfolios from './resources/portfolios';
@@ -61,6 +62,7 @@ export default class Client {
     this.timeout = options.timeout || 30000; // Optional request timeout (ms).
 
     this.accounts = new Accounts(this);
+    this.applications = new Applications(this);
     this.auth = new Auth(this);
     this.companies = new Companies(this);
     this.portfolios = new Portfolios(this);
