@@ -5,6 +5,17 @@ export default class Companies {
   }
 
   /**
+   * List company resources.
+   *
+   * @param {object} params Query parameters.
+   * @param {function} cb The callback with two parameters, error and an array of company resources.
+   * @returns
+   */
+  list(params, cb) {
+    return this.client.get('companies', params, cb);
+  }
+
+  /**
    * Get a company resource.
    *
    * @param {string} guid The Global Unique ID of the company.
