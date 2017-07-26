@@ -1,6 +1,6 @@
 {
   "name": "eccentrade-client",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Universal Javascript bindings for the Eccentrade API.",
   "author": "Sander van den Akker <sander@eccentrade.com>",
   "license": "MIT",
@@ -13,6 +13,7 @@
     "build": "babel src --out-dir dist",
     "watch": "node_modules/.bin/nodemon --exec \"npm run build\" --watch src",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "release:patch": "npm version patch --no-git-tag-version && conventional-changelog -p angular -i CHANGELOG.md -s",
     "prepublish": "npm run build"
   },
   "repository": {
