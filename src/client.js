@@ -48,7 +48,7 @@ function timeout(ms, promise) {
 
 export default class Client {
   constructor(options) {
-    if (!options || !options.url || !options.appId) {
+    if (!options || !options.appId) {
       console.log('Missing Eccentrade API client configuration settings.');
     }
 
