@@ -1,3 +1,13 @@
+<a name="1.0.21"></a>
+## [1.0.21](https://github.com/eccentrade/eccentrade-node/compare/1.0.20...v1.0.21) (2017-08-30)
+
+
+### Bug Fixes
+
+* Don’t crash when no url is configured ([e7349a8](https://github.com/eccentrade/eccentrade-node/commit/e7349a8))
+
+
+
 <a name="1.0.20"></a>
 ## [1.0.20](https://github.com/eccentrade/eccentrade-node/compare/1.0.17...v1.0.20) (2017-07-26)
 
