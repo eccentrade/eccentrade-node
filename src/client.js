@@ -91,9 +91,16 @@ export default class Client {
     return new Promise((resolve, reject) => {
       fetch(url, payload)
         .then((response) => {
-          const body = response.json();
           if (response.ok) {
-            return body.then((result) => { return result; });
+            // A 204 without body will cause a json parsing exception.
+            if (response.status === 204) {
+              return {};
+            }
+            const body = response.json();
+            return body.then((result) => {
+              console.log(result);
+              return result;
+            });
           }
           // If the current call returned 401 Unauthorized, and it is not a failed authorization call.
           if (response.status === 401 && response.url.indexOf('auth') === -1 && this.refreshToken) {
