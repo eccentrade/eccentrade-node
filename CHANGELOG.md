@@ -1,3 +1,13 @@
+<a name="1.0.22"></a>
+## [1.0.22](https://github.com/eccentrade/eccentrade-node/compare/1.0.21...v1.0.22) (2017-10-20)
+
+
+### Bug Fixes
+
+* Solved exception on empty response bodies ([d6d546e](https://github.com/eccentrade/eccentrade-node/commit/d6d546e))
+
+
+
 <a name="1.0.21"></a>
 ## [1.0.21](https://github.com/eccentrade/eccentrade-node/compare/1.0.20...v1.0.21) (2017-08-30)
 
