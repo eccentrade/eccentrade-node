@@ -98,7 +98,6 @@ export default class Client {
             }
             const body = response.json();
             return body.then((result) => {
-              console.log(result);
               return result;
             });
           }
