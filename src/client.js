@@ -97,6 +97,9 @@ export default class Client {
               return {};
             }
             const body = response.json();
+            if (!body) {
+              return {};
+            }
             return body.then((result) => {
               return result;
             });
@@ -115,12 +118,10 @@ export default class Client {
                 cb(error);
                 return reject(error);
               });
-          } else {
-            if (n > 0) {
-              return this.fetch(n - 1, url, payload, cb);
-            }
+          } else if (n > 0) {
+            return this.fetch(n - 1, url, payload, cb);
           }
-          return body.then((error) => { throw error; });
+          throw new Error('Maximum retry count exceeded.');
         })
         .then((result) => {
           cb(null, result);
