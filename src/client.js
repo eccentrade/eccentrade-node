@@ -94,7 +94,6 @@ export default class Client {
     return new Promise((resolve, reject) => {
       fetch(url, payload)
         .then((response) => {
-          console.log(n, response.ok, response.status);
           if (response.ok) {
             // A 204 without body will cause a json parsing exception.
             if (response.status === 204) {
