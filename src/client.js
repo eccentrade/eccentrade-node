@@ -39,10 +39,13 @@ function convertObjectToUrlParameterString(obj) {
  */
 function timeout(ms, promise) {
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
+    const timer = setTimeout(function () {
       reject(new Error('ECONNTIMEOUT'));
     }, ms);
-    promise.then(resolve, reject);
+    promise
+      .then(resolve, reject)
+      .catch(reject)
+      .then(() => clearTimeout(timer));
   });
 }
 
@@ -91,6 +94,7 @@ export default class Client {
     return new Promise((resolve, reject) => {
       fetch(url, payload)
         .then((response) => {
+          console.log(n, response.ok, response.status);
           if (response.ok) {
             // A 204 without body will cause a json parsing exception.
             if (response.status === 204) {
@@ -118,6 +122,8 @@ export default class Client {
                 cb(error);
                 return reject(error);
               });
+          } else if (response.status !== 401) {
+            return reject({ statusCode: response.status, error: response.statusText });
           } else if (n > 0) {
             return this.fetch(n - 1, url, payload, cb);
           }
