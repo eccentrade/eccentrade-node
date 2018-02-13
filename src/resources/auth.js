@@ -18,7 +18,7 @@ export default class Users {
       appId: this.client.appId,
       password,
     };
-    if (user.indexOf('@') === -1) {
+    if ((user || '').indexOf('@') === -1) {
       body.username = user;
     } else {
       body.email = user;

@@ -108,7 +108,7 @@ export default class Client {
             });
           }
           // If the current call returned 401 Unauthorized, and it is not a failed authorization call.
-          if (response.status === 401 && response.url.indexOf('auth') === -1 && this.refreshToken) {
+          if (response.status === 401 && response.url && response.url.indexOf('auth') === -1 && this.refreshToken) {
             // Transparently retry the request by refreshing the access token.
             return this.auth.refresh(this.refreshToken)
               .then((result) => {
