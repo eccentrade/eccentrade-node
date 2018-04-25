@@ -39,10 +39,13 @@ function convertObjectToUrlParameterString(obj) {
  */
 function timeout(ms, promise) {
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
+    const timer = setTimeout(function () {
       reject(new Error('ECONNTIMEOUT'));
     }, ms);
-    promise.then(resolve, reject);
+    promise
+      .then(resolve, reject)
+      .catch(reject)
+      .then(() => clearTimeout(timer));
   });
 }
 
@@ -105,7 +108,7 @@ export default class Client {
             });
           }
           // If the current call returned 401 Unauthorized, and it is not a failed authorization call.
-          if (response.status === 401 && response.url.indexOf('auth') === -1 && this.refreshToken) {
+          if (response.status === 401 && response.url && response.url.indexOf('auth') === -1 && this.refreshToken) {
             // Transparently retry the request by refreshing the access token.
             return this.auth.refresh(this.refreshToken)
               .then((result) => {
@@ -118,6 +121,8 @@ export default class Client {
                 cb(error);
                 return reject(error);
               });
+          } else if (response.status !== 401) {
+            return reject({ statusCode: response.status, error: response.statusText });
           } else if (n > 0) {
             return this.fetch(n - 1, url, payload, cb);
           }

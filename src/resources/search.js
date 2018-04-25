@@ -1,5 +1,7 @@
 import { assignIn } from 'lodash';
 
+const debug = require('debug')('client-search');
+
 export default class Search {
 
   constructor(client) {
@@ -21,7 +23,12 @@ export default class Search {
    * @memberOf Search
    */
   companies(query, filter, options, cb) {
-    return this.client.get('search/companies', assignIn({}, { q: query }, filter, options), cb);
+    let params = assignIn({}, filter, options);
+    if (query) {
+      params = assignIn(params, { q: query });
+    }
+    debug(params);
+    return this.client.get('search/companies', params, cb);
   }
 }
 
