@@ -21,6 +21,7 @@
     "url": "https://github.com/eccentrade/eccentrade-node.git"
   },
   "dependencies": {
+    "debug": "^3.1.0",
     "es6-promise": "^4.0.5",
     "events": "^1.1.1",
     "isomorphic-fetch": "^2.2.1",
